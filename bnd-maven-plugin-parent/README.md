@@ -1,6 +1,6 @@
 bnd maven plugin
 ================
-This plugin is based on work started by Toni Menzel and others to enable Maven-based builds on bnd/bndtools projects where the idea is that you use Bndtools in Eclipse as a development environment and have the option to use Maven to build your projects en a headless environment.
+This plugin is based on work started by Toni Menzel and others to enable Maven-based builds on bnd/bndtools projects where the idea is that you use Bndtools in Eclipse as a development environment and have the option to use Maven to build your projects in a headless environment.
 The result is a plugin that fully builds any bnd project. It even supports multiple bundle projects, the
 multiple jars are then created with classifiers.
 
@@ -58,6 +58,8 @@ Finally, regarding doing releases in Maven... Typically in Maven you'd develop u
 
 Issues
 ======
+These were here before... May need updating...
+
 There is a TODO in the cnf/pom.xml (a dep I do not understand)
 
 I do not understand why I need to define the compiler plugin
