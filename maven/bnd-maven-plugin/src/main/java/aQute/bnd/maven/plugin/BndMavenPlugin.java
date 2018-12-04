@@ -146,6 +146,9 @@ public class BndMavenPlugin extends AbstractMojo {
 	@SuppressWarnings("unused")
 	private String									bnd;
 
+	@Parameter
+	private Properties								instructions;
+
 	@Component
 	private BuildContext							buildContext;
 
@@ -499,6 +502,8 @@ public class BndMavenPlugin extends AbstractMojo {
 
 	private File loadProjectProperties(Builder builder, MavenProject bndProject, MavenProject pomProject,
 		Xpp3Dom configuration) throws Exception {
+		File projectFile = null;
+
 		// check for bnd file configuration
 		File baseDir = bndProject.getBasedir();
 		if (baseDir != null) { // file system based pom
@@ -512,7 +517,7 @@ public class BndMavenPlugin extends AbstractMojo {
 				logger.debug("loading bnd properties from file: {}", bndFile);
 				// we use setProperties to handle -include
 				builder.setProperties(bndFile.getParentFile(), builder.loadProperties(bndFile));
-				return bndFile;
+				projectFile = bndFile;
 			}
 			// no bnd file found, so we fall through
 		}
@@ -523,15 +528,39 @@ public class BndMavenPlugin extends AbstractMojo {
 		if (baseDir != null) {
 			builder.updateModified(pomFile.lastModified(), "POM: " + pomFile);
 		}
+
 		Xpp3Dom bndElement = configuration.getChild("bnd");
 		if (bndElement != null) {
-			logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
-			UTF8Properties properties = new UTF8Properties();
-			properties.load(bndElement.getValue(), pomFile, builder);
-			// we use setProperties to handle -include
-			builder.setProperties(baseDir, properties.replaceHere(baseDir));
+			if (projectFile == null) {
+				logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
+				projectFile = pomFile;
+				UTF8Properties properties = new UTF8Properties();
+				properties.load(bndElement.getValue(), projectFile, builder);
+				// we use setProperties to handle -include
+				builder.setProperties(baseDir, properties.replaceHere(baseDir));
+			} else {
+				logger.warn("Pom defines both bndfile and bnd configuration. Ignoring the bnd configuration in pom: {}",
+					pomProject);
+			}
 		}
-		return pomFile;
+
+		if (instructions != null && instructions.size() > 0) {
+			if (bndElement == null && projectFile == null) {
+				logger.debug("loading bnd properties from the instructions element in pom: {}", pomProject);
+				projectFile = pomFile;
+				// Copy into UTF8Properties so that we can replace ${.}
+				// placeholders
+				UTF8Properties properties = new UTF8Properties();
+				properties.putAll(instructions);
+				builder.setProperties(baseDir, properties.replaceHere(baseDir));
+			} else {
+				logger.warn(
+					"Pom defines both a bnd/bndfile and instructions element. Ignoring the instructions element in pom: {}",
+					pomProject);
+			}
+		}
+
+		return projectFile;
 	}
 
 	private Optional<Xpp3Dom> getConfiguration(List<Plugin> plugins) {
