@@ -48,7 +48,6 @@
     org.example.api,\
     org.example.types
 -sources: true
-Bundle-Version: ${project.version}.bndqual
 Here: ${.}
 ]]></bnd>
                 </configuration>

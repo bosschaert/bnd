@@ -53,6 +53,7 @@ assert impl_manifest.getValue('X-ParentProjectProperty') == 'it worked'
 assert wrapper_manifest.getValue('X-ParentProjectProperty') == 'overridden'
 assert in_build_pluginManagement_api_manifest.getValue('X-ParentProjectProperty') == 'overridden'
 assert in_build_pluginManagement_api_manifest.getValue('X-ParentProjectProperty2') == 'it worked'
+assert pom_instr_manifest.getValue('X-ParentProjectProperty') == 'it worked'
 
 // Check -include of bnd files
 assert api_manifest.getValue('X-IncludedParentProjectProperty') == 'Included via -include in parent bnd.bnd file'
@@ -60,6 +61,7 @@ assert impl_manifest.getValue('X-IncludedParentProjectProperty') == 'Included vi
 assert wrapper_manifest.getValue('X-IncludedParentProjectProperty') == 'Included via -include in parent bnd.bnd file'
 assert wrapper_manifest.getValue('X-IncludedProperty') == 'Included via -include in project bnd.bnd file'
 assert impl_manifest.getValue('X-IncludedProjectProperty') == 'Included via -include in project bnd.bnd file'
+assert pom_instr_manifest.getValue('X-IncludedParentProjectProperty') == 'Included via -include in parent bnd.bnd file'
 
 // Check POM properties
 assert impl_manifest.getValue('Project-Build-OutputDirectory') == new File(basedir, 'test-impl-bundle/target/classes').absolutePath
@@ -75,20 +77,27 @@ assert impl_manifest.getValue('SomeParentVar') == 'parentValue'
 assert api_manifest.getValue('Project-Name') == 'Test API Bundle'
 assert impl_manifest.getValue('Project-Name') == 'test-impl-bundle'
 assert wrapper_manifest.getValue('Project-Name') == 'test-wrapper-bundle'
+assert pom_instr_manifest.getValue('Project-Name') == 'Test POM Instructions'
 assert api_manifest.getValue('Project-Dir') == new File(basedir, 'test-api-bundle').absolutePath.replace(File.separatorChar, '/' as char)
 assert impl_manifest.getValue('Project-Dir') == new File(basedir, 'test-impl-bundle').absolutePath.replace(File.separatorChar, '/' as char)
 assert wrapper_manifest.getValue('Project-Dir') == new File(basedir, 'test-wrapper-bundle').absolutePath.replace(File.separatorChar, '/' as char)
+assert pom_instr_manifest.getValue('Project-Dir') == new File(basedir, 'test-pom-instructions').absolutePath.replace(File.separatorChar, '/' as char)
 assert api_manifest.getValue('Project-Output') == new File(basedir, 'test-api-bundle/target').absolutePath
 assert impl_manifest.getValue('Project-Output') == new File(basedir, 'test-impl-bundle/target').absolutePath
 assert wrapper_manifest.getValue('Project-Output') == new File(basedir, 'test-wrapper-bundle/target').absolutePath
+assert pom_instr_manifest.getValue('Project-Output') == new File(basedir, 'test-pom-instructions/target').absolutePath
 assert api_manifest.getValue('Project-Buildpath')
 assert impl_manifest.getValue('Project-Buildpath')
 assert wrapper_manifest.getValue('Project-Buildpath')
+assert pom_instr_manifest.getValue('Project-Buildpath')
 assert api_manifest.getValue('Project-Sourcepath')
 assert impl_manifest.getValue('Project-Sourcepath')
 assert !wrapper_manifest.getValue('Project-Sourcepath')
+assert pom_instr_manifest.getValue('Project-Sourcepath')
 assert api_manifest.getValue('Here') == new File(basedir, 'test-api-bundle').absolutePath.replace(File.separatorChar, '/' as char)
+assert pom_instr_manifest.getValue('Here') == new File(basedir, 'test-pom-instructions').absolutePath.replace(File.separatorChar, '/' as char)
 assert api_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
+assert pom_instr_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
 assert impl_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
 assert wrapper_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
 assert impl_manifest.getValue('Project-License') == 'Apache License, Version 2.0'
@@ -99,7 +108,11 @@ assert api_jar.getEntry('org/example/api/aresource.txt') != null
 assert api_jar.getInputStream(api_jar.getEntry('org/example/api/aresource.txt')).text =~ /This is a resource/
 assert api_jar.getEntry('org/example/types/') != null
 assert api_jar.getEntry('OSGI-OPT/src/') != null
-assert impl_jar.getEntry('org/example/impl/') != null
+assert pom_instr_jar.getEntry('org/example/api/') != null
+assert pom_instr_jar.getEntry('org/example/api/aresource.txt') != null
+assert pom_instr_jar.getInputStream(api_jar.getEntry('org/example/api/aresource.txt')).text =~ /This is a resource/
+assert pom_instr_jar.getEntry('org/example/types/') != null
+assert pom_instr_jar.getEntry('OSGI-OPT/src/') != null
 assert impl_jar.getEntry('OSGI-INF/org.example.impl.ExampleComponent.xml') != null
 assert impl_jar.getEntry('OSGI-INF/metatype/org.example.impl.Config.xml') != null
 assert wrapper_jar.getEntry('org/example/api/') != null
