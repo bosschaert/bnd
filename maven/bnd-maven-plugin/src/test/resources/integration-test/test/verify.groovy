@@ -14,6 +14,8 @@ File wrapper_bundle = new File(basedir, 'test-wrapper-bundle/target/test-wrapper
 assert wrapper_bundle.isFile()
 File in_build_pluginManagement_api_bundle = new File(basedir, 'test-in-build-pluginManagement-inheritance/test-inheriting-api-bundle/target/test-inheriting-api-bundle-0.0.1.jar')
 assert in_build_pluginManagement_api_bundle.isFile()
+File pom_instr = new File(basedir, 'test-pom-instructions/target/test.pom.instructions-1.2.3.jar')
+assert pom_instr.isFile()
 
 // Load manifests
 JarFile api_jar = new JarFile(api_bundle)
@@ -24,20 +26,25 @@ JarFile wrapper_jar = new JarFile(wrapper_bundle)
 Attributes wrapper_manifest = wrapper_jar.getManifest().getMainAttributes()
 JarFile in_build_pluginManagement_api_jar = new JarFile(in_build_pluginManagement_api_bundle)
 Attributes in_build_pluginManagement_api_manifest = in_build_pluginManagement_api_jar.getManifest().getMainAttributes()
+JarFile pom_instr_jar = new JarFile(pom_instr)
+Attributes pom_instr_manifest = pom_instr_jar.getManifest().getMainAttributes()
 
 // Basic manifest check
 assert api_manifest.getValue('Bundle-SymbolicName') == 'test.api.bundle'
 assert impl_manifest.getValue('Bundle-SymbolicName') == 'test-impl-bundle'
 assert wrapper_manifest.getValue('Bundle-SymbolicName') == 'test.wrapper.bundle'
+assert pom_instr_manifest.getValue('Bundle-SymbolicName') == 'test.pom.instructions'
 assert in_build_pluginManagement_api_manifest.getValue('Bundle-SymbolicName') == 'biz.aQute.bnd-test.test-inheriting-api-bundle'
 assert api_manifest.getValue('Bundle-Name') == 'Test API Bundle'
 assert impl_manifest.getValue('Bundle-Name') == 'Test Impl Bundle'
 assert wrapper_manifest.getValue('Bundle-Name') == 'test-wrapper-bundle'
+assert pom_instr_manifest.getValue('Bundle-Name') == 'Test POM Instructions'
 assert api_manifest.getValue('Bundle-Version') == '0.0.1.bndqual'
 assert impl_manifest.getValue('Bundle-Version') == '0.0.1.SNAPSHOT'
 assert wrapper_manifest.getValue('Bundle-Version') != '0.0.1.BUILD-SNAPSHOT'
 assert wrapper_manifest.getValue('Bundle-Version') =~ /^0\.0\.1\.BUILD-/
 assert in_build_pluginManagement_api_manifest.getValue('Bundle-Version') == '0.0.1'
+assert pom_instr_manifest.getValue('Bundle-Version') == '1.2.3'
 assert wrapper_manifest.getValue('Bundle-ClassPath') == '.,lib/osgi.annotation.jar'
 
 // Check inheritance of properties in bnd.bnd from the parent project
