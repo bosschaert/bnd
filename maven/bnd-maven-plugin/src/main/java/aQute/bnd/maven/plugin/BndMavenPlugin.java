@@ -475,14 +475,14 @@ public class BndMavenPlugin extends AbstractMojo {
 		return loadProjectProperties(builder, project, project, configuration, tracker);
 	}
 
-	private Map<String, Xpp3Dom> loadParentProjectProperties(Builder builder, MavenProject currentProject,
-		Map<String, Xpp3Dom> pair)
+	private void loadParentProjectProperties(Builder builder, MavenProject currentProject,
+		Map<String, Xpp3Dom> tracker)
 		throws Exception {
 		MavenProject parentProject = currentProject.getParent();
 		if (parentProject == null) {
-			return new HashMap<>();
+			return;
 		}
-		loadParentProjectProperties(builder, parentProject, pair);
+		loadParentProjectProperties(builder, parentProject, tracker);
 
 		// Get configuration from parent project
 		Xpp3Dom configuration = Optional.ofNullable(parentProject.getBuildPlugins())
@@ -490,8 +490,8 @@ public class BndMavenPlugin extends AbstractMojo {
 			.orElse(null);
 		if (configuration != null) {
 			// Load parent project's properties
-			loadProjectProperties(builder, parentProject, parentProject, configuration, pair);
-			return pair;
+			loadProjectProperties(builder, parentProject, parentProject, configuration, tracker);
+			return;
 		}
 
 		// Get configuration in project's pluginManagement
@@ -501,12 +501,11 @@ public class BndMavenPlugin extends AbstractMojo {
 			.orElseGet(this::defaultConfiguration);
 		// Load properties from parent project's bnd file or configuration in
 		// project's pluginManagement
-		loadProjectProperties(builder, parentProject, currentProject, configuration, pair);
-		return pair;
+		loadProjectProperties(builder, parentProject, currentProject, configuration, tracker);
 	}
 
 	private File loadProjectProperties(Builder builder, MavenProject bndProject, MavenProject pomProject,
-		Xpp3Dom configuration, Map<String, Xpp3Dom> pair) throws Exception {
+		Xpp3Dom configuration, Map<String, Xpp3Dom> tracker) throws Exception {
 		File projectFile = null;
 
 		// check for bnd file configuration
@@ -538,9 +537,9 @@ public class BndMavenPlugin extends AbstractMojo {
 		Xpp3Dom bndElement = configuration.getChild("bnd");
 		if (bndElement != null) {
 			if (projectFile == null) {
-				if (pair.get("bnd") == null || pair.get("bnd")
-					.equals(bndElement)) {
-					pair.put("bnd", bndElement);
+				if (tracker.get("bnd") == null || tracker.get("bnd")
+					.equals(bndElement) || instructions == null || instructions.size() == 0) {
+					tracker.put("bnd", bndElement);
 					logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
 					projectFile = pomFile;
 					UTF8Properties properties = new UTF8Properties();
@@ -564,10 +563,11 @@ public class BndMavenPlugin extends AbstractMojo {
 				// TODO find a way to pass it through the checking mechanism.
 				properties.putAll(instructions);
 				builder.setProperties(baseDir, properties.replaceHere(baseDir));
-			} else {
-				logger.warn(
-					"Pom defines both a bnd/bndfile and instructions element. Ignoring the instructions element in pom: {}",
-					pomProject);
+				// } else {
+				// logger.warn(
+				// "Pom defines both a bnd/bndfile and instructions element.
+				// Ignoring the instructions element in pom: {}",
+				// pomProject);
 			}
 		}
 
