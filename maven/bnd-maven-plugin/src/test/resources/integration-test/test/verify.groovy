@@ -16,6 +16,8 @@ File in_build_pluginManagement_api_bundle = new File(basedir, 'test-in-build-plu
 assert in_build_pluginManagement_api_bundle.isFile()
 File pom_instr = new File(basedir, 'test-pom-instructions/target/test.pom.instructions-1.2.3.jar')
 assert pom_instr.isFile()
+File pom_instr2 = new File(basedir, 'test-pom-instructions2/target/test.pom.instructions2-2.0.0.jar')
+assert pom_instr2.isFile()
 
 // Load manifests
 JarFile api_jar = new JarFile(api_bundle)

@@ -17,6 +17,7 @@ package aQute.bnd.maven.plugin;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ import aQute.bnd.osgi.Builder;
 import aQute.bnd.osgi.Constants;
 import aQute.bnd.osgi.FileResource;
 import aQute.bnd.osgi.Jar;
+import aQute.bnd.osgi.Macro;
 import aQute.bnd.osgi.Processor;
 import aQute.bnd.osgi.Resource;
 import aQute.bnd.version.MavenVersion;
@@ -537,8 +539,10 @@ public class BndMavenPlugin extends AbstractMojo {
 		Xpp3Dom bndElement = configuration.getChild("bnd");
 		if (bndElement != null) {
 			if (projectFile == null) {
-				if (tracker.get("bnd") == null || tracker.get("bnd")
-					.equals(bndElement) || instructions == null || instructions.size() == 0) {
+				// Do we need the instructions thing here?
+				if (!fuzzyEquals(bndElement, tracker.get("bnd"), projectFile, builder)
+					|| instructions == null
+					|| instructions.size() == 0) {
 					tracker.put("bnd", bndElement);
 					logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
 					projectFile = pomFile;
@@ -553,7 +557,7 @@ public class BndMavenPlugin extends AbstractMojo {
 			}
 		}
 
-		if (instructions != null && instructions.size() > 0) {
+		if (instructions != null && instructions.size() > 0 && configuration.getChild("instructions") != null) {
 			if (projectFile == null && !bndUsed) {
 				logger.debug("loading bnd properties from the instructions element in pom: {}", pomProject);
 				projectFile = pomFile;
@@ -563,15 +567,56 @@ public class BndMavenPlugin extends AbstractMojo {
 				// TODO find a way to pass it through the checking mechanism.
 				properties.putAll(instructions);
 				builder.setProperties(baseDir, properties.replaceHere(baseDir));
-				// } else {
-				// logger.warn(
-				// "Pom defines both a bnd/bndfile and instructions element.
-				// Ignoring the instructions element in pom: {}",
-				// pomProject);
+			} else {
+				logger.warn(
+					"Pom defines both a bnd/bndfile and instructions element. Ignoring the instructions element in pom: {}",
+					pomProject);
 			}
 		}
 
 		return projectFile;
+	}
+
+	private boolean fuzzyEquals(Xpp3Dom d1, Xpp3Dom d2, File projectFile, Builder builder)
+		throws IOException {
+		if (d1 == null && d2 == null)
+			return true;
+
+		if (d1 == null || d2 == null)
+			return false;
+		UTF8Properties p1 = new UTF8Properties();
+		p1.load(d1.getValue(), projectFile, builder);
+
+		UTF8Properties p2 = new UTF8Properties();
+		p2.load(d2.getValue(), projectFile, builder);
+
+		if (p1.size() != p2.size()) {
+			return false;
+		}
+
+		Properties beanProperties = new BeanProperties();
+		beanProperties.put("project", project);
+		beanProperties.put("settings", settings);
+		Properties mavenProperties = new Properties(beanProperties);
+		mavenProperties.putAll(project.getProperties());
+
+		for (String key : p1.stringPropertyNames()) {
+			String p1val = p1.getProperty(key);
+			String p2val = p2.getProperty(key);
+
+			if (Objects.equals(p1val, p2val))
+				continue;
+
+			try (Processor p = new Processor(mavenProperties, false)) {
+				Macro m = p.getReplacer();
+				String p1valp = m.process(p1val);
+				String p2valp = m.process(p2val);
+
+				if (!p1valp.equals(p2valp))
+					return false;
+			}
+		}
+		return true;
 	}
 
 	private Optional<Xpp3Dom> getConfiguration(List<Plugin> plugins) {
