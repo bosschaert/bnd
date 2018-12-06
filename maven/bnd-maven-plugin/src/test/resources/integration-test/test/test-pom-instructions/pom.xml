@@ -43,13 +43,26 @@
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
                 <configuration>
+                     
+                    <instructions>
+                        <Here>${.}</Here>
+                        <property>
+                            <name>-exportcontents</name>
+                            <value>org.example.api,org.example.types</value>
+                        </property>
+                        <property>
+                            <name>-sources</name>
+                            <value>true</value>
+                        </property>
+                    </instructions>
+                    <!--
                     <bnd><![CDATA[
 -exportcontents: \
     org.example.api,\
     org.example.types
 -sources: true
 Here: ${.}
-]]></bnd>
+]]></bnd>  -->
                 </configuration>
             </plugin>
 		</plugins>

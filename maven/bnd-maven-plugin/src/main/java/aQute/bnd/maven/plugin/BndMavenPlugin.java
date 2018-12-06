@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -463,22 +464,25 @@ public class BndMavenPlugin extends AbstractMojo {
 	}
 	
 	private File loadProperties(Builder builder) throws Exception {
+		Map<String, Xpp3Dom> tracker = new HashMap<>();
 		// Load parent project properties first
-		loadParentProjectProperties(builder, project);
+		loadParentProjectProperties(builder, project, tracker);
 
 		// Load current project properties
 		Xpp3Dom configuration = Optional.ofNullable(project.getBuildPlugins())
 			.flatMap(this::getConfiguration)
 			.orElseGet(this::defaultConfiguration);
-		return loadProjectProperties(builder, project, project, configuration);
+		return loadProjectProperties(builder, project, project, configuration, tracker);
 	}
 
-	private void loadParentProjectProperties(Builder builder, MavenProject currentProject) throws Exception {
+	private Map<String, Xpp3Dom> loadParentProjectProperties(Builder builder, MavenProject currentProject,
+		Map<String, Xpp3Dom> pair)
+		throws Exception {
 		MavenProject parentProject = currentProject.getParent();
 		if (parentProject == null) {
-			return;
+			return new HashMap<>();
 		}
-		loadParentProjectProperties(builder, parentProject);
+		loadParentProjectProperties(builder, parentProject, pair);
 
 		// Get configuration from parent project
 		Xpp3Dom configuration = Optional.ofNullable(parentProject.getBuildPlugins())
@@ -486,8 +490,8 @@ public class BndMavenPlugin extends AbstractMojo {
 			.orElse(null);
 		if (configuration != null) {
 			// Load parent project's properties
-			loadProjectProperties(builder, parentProject, parentProject, configuration);
-			return;
+			loadProjectProperties(builder, parentProject, parentProject, configuration, pair);
+			return pair;
 		}
 
 		// Get configuration in project's pluginManagement
@@ -497,11 +501,12 @@ public class BndMavenPlugin extends AbstractMojo {
 			.orElseGet(this::defaultConfiguration);
 		// Load properties from parent project's bnd file or configuration in
 		// project's pluginManagement
-		loadProjectProperties(builder, parentProject, currentProject, configuration);
+		loadProjectProperties(builder, parentProject, currentProject, configuration, pair);
+		return pair;
 	}
 
 	private File loadProjectProperties(Builder builder, MavenProject bndProject, MavenProject pomProject,
-		Xpp3Dom configuration) throws Exception {
+		Xpp3Dom configuration, Map<String, Xpp3Dom> pair) throws Exception {
 		File projectFile = null;
 
 		// check for bnd file configuration
@@ -529,15 +534,20 @@ public class BndMavenPlugin extends AbstractMojo {
 			builder.updateModified(pomFile.lastModified(), "POM: " + pomFile);
 		}
 
+		boolean bndUsed = false;
 		Xpp3Dom bndElement = configuration.getChild("bnd");
 		if (bndElement != null) {
 			if (projectFile == null) {
-				logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
-				projectFile = pomFile;
-				UTF8Properties properties = new UTF8Properties();
-				properties.load(bndElement.getValue(), projectFile, builder);
-				// we use setProperties to handle -include
-				builder.setProperties(baseDir, properties.replaceHere(baseDir));
+				if (pair.get("bnd") == null || pair.get("bnd")
+					.equals(bndElement)) {
+					pair.put("bnd", bndElement);
+					logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
+					projectFile = pomFile;
+					UTF8Properties properties = new UTF8Properties();
+					properties.load(bndElement.getValue(), projectFile, builder);
+					// we use setProperties to handle -include
+					builder.setProperties(baseDir, properties.replaceHere(baseDir));
+				}
 			} else {
 				logger.warn("Pom defines both bndfile and bnd configuration. Ignoring the bnd configuration in pom: {}",
 					pomProject);
@@ -545,12 +555,13 @@ public class BndMavenPlugin extends AbstractMojo {
 		}
 
 		if (instructions != null && instructions.size() > 0) {
-			if (bndElement == null && projectFile == null) {
+			if (projectFile == null && !bndUsed) {
 				logger.debug("loading bnd properties from the instructions element in pom: {}", pomProject);
 				projectFile = pomFile;
 				// Copy into UTF8Properties so that we can replace ${.}
 				// placeholders
 				UTF8Properties properties = new UTF8Properties();
+				// TODO find a way to pass it through the checking mechanism.
 				properties.putAll(instructions);
 				builder.setProperties(baseDir, properties.replaceHere(baseDir));
 			} else {
