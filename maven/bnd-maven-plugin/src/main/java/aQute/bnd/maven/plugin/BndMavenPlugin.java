@@ -544,6 +544,7 @@ public class BndMavenPlugin extends AbstractMojo {
 					|| instructions == null
 					|| instructions.size() == 0) {
 					tracker.put("bnd", bndElement);
+					bndUsed = true;
 					logger.debug("loading bnd properties from bnd element in pom: {}", pomProject);
 					projectFile = pomFile;
 					UTF8Properties properties = new UTF8Properties();

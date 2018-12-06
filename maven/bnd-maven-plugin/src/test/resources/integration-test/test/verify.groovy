@@ -30,6 +30,8 @@ JarFile in_build_pluginManagement_api_jar = new JarFile(in_build_pluginManagemen
 Attributes in_build_pluginManagement_api_manifest = in_build_pluginManagement_api_jar.getManifest().getMainAttributes()
 JarFile pom_instr_jar = new JarFile(pom_instr)
 Attributes pom_instr_manifest = pom_instr_jar.getManifest().getMainAttributes()
+JarFile pom_instr_jar2 = new JarFile(pom_instr2)
+Attributes pom_instr_manifest2 = pom_instr_jar2.getManifest().getMainAttributes()
 
 // Basic manifest check
 assert api_manifest.getValue('Bundle-SymbolicName') == 'test.api.bundle'
@@ -48,6 +50,8 @@ assert wrapper_manifest.getValue('Bundle-Version') =~ /^0\.0\.1\.BUILD-/
 assert in_build_pluginManagement_api_manifest.getValue('Bundle-Version') == '0.0.1'
 assert pom_instr_manifest.getValue('Bundle-Version') == '1.2.3'
 assert wrapper_manifest.getValue('Bundle-ClassPath') == '.,lib/osgi.annotation.jar'
+assert pom_instr_manifest2.getValue('Mykey') == 'myvalue'
+assert pom_instr_manifest2.getValue('Myotherkey') == 'myothervalue'
 
 // Check inheritance of properties in bnd.bnd from the parent project
 assert api_manifest.getValue('X-ParentProjectProperty') == 'it worked'

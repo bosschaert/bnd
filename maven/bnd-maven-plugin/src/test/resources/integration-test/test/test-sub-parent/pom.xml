@@ -17,7 +17,7 @@
 				<artifactId>bnd-maven-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <mykey>myvalue</mykey>
+                        <Mykey>myvalue</Mykey>
                         <!-- 
                         <property>
                             <name>-include</name>
