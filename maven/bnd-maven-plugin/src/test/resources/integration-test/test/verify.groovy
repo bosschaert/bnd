@@ -84,14 +84,17 @@ assert api_manifest.getValue('Project-Name') == 'Test API Bundle'
 assert impl_manifest.getValue('Project-Name') == 'test-impl-bundle'
 assert wrapper_manifest.getValue('Project-Name') == 'test-wrapper-bundle'
 assert pom_instr_manifest.getValue('Project-Name') == 'Test POM Instructions'
+assert pom_instr_manifest2.getValue('Project-Name') == 'Test POM Instructions 2'
 assert api_manifest.getValue('Project-Dir') == new File(basedir, 'test-api-bundle').absolutePath.replace(File.separatorChar, '/' as char)
 assert impl_manifest.getValue('Project-Dir') == new File(basedir, 'test-impl-bundle').absolutePath.replace(File.separatorChar, '/' as char)
 assert wrapper_manifest.getValue('Project-Dir') == new File(basedir, 'test-wrapper-bundle').absolutePath.replace(File.separatorChar, '/' as char)
 assert pom_instr_manifest.getValue('Project-Dir') == new File(basedir, 'test-pom-instructions').absolutePath.replace(File.separatorChar, '/' as char)
+assert pom_instr_manifest2.getValue('Project-Dir') == new File(basedir, 'test-pom-instructions2').absolutePath.replace(File.separatorChar, '/' as char)
 assert api_manifest.getValue('Project-Output') == new File(basedir, 'test-api-bundle/target').absolutePath
 assert impl_manifest.getValue('Project-Output') == new File(basedir, 'test-impl-bundle/target').absolutePath
 assert wrapper_manifest.getValue('Project-Output') == new File(basedir, 'test-wrapper-bundle/target').absolutePath
 assert pom_instr_manifest.getValue('Project-Output') == new File(basedir, 'test-pom-instructions/target').absolutePath
+assert pom_instr_manifest2.getValue('Project-Output') == new File(basedir, 'test-pom-instructions2/target').absolutePath
 assert api_manifest.getValue('Project-Buildpath')
 assert impl_manifest.getValue('Project-Buildpath')
 assert wrapper_manifest.getValue('Project-Buildpath')

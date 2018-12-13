@@ -55,14 +55,6 @@
                             <value>true</value>
                         </property>
                     </instructions>
-                    <!--
-                    <bnd><![CDATA[
--exportcontents: \
-    org.example.api,\
-    org.example.types
--sources: true
-Here: ${.}
-]]></bnd>  -->
                 </configuration>
             </plugin>
 		</plugins>
