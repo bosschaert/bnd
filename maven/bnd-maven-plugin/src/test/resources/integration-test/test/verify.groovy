@@ -49,6 +49,8 @@ assert wrapper_manifest.getValue('Bundle-Version') != '0.0.1.BUILD-SNAPSHOT'
 assert wrapper_manifest.getValue('Bundle-Version') =~ /^0\.0\.1\.BUILD-/
 assert in_build_pluginManagement_api_manifest.getValue('Bundle-Version') == '0.0.1'
 assert pom_instr_manifest.getValue('Bundle-Version') == '1.2.3'
+assert pom_instr_manifest.getValue('TestKey') == 'testval'
+assert pom_instr_manifest.getValue('Export-Package') =~ /blah/
 assert wrapper_manifest.getValue('Bundle-ClassPath') == '.,lib/osgi.annotation.jar'
 assert pom_instr_manifest2.getValue('Mykey') == 'myvalue'
 assert pom_instr_manifest2.getValue('Myotherkey') == 'myothervalue'
@@ -127,3 +129,4 @@ assert impl_jar.getEntry('OSGI-INF/metatype/org.example.impl.Config.xml') != nul
 assert wrapper_jar.getEntry('org/example/api/') != null
 assert wrapper_jar.getEntry('org/example/types/') != null
 assert wrapper_jar.getEntry('lib/osgi.annotation.jar') != null
+

@@ -46,13 +46,10 @@
                      
                     <instructions>
                         <Here>${.}</Here>
+                        <TestKey>testval</TestKey>
                         <property>
                             <name>-exportcontents</name>
-                            <value>org.example.api,org.example.types</value>
-                        </property>
-                        <property>
-                            <name>-sources</name>
-                            <value>true</value>
+                            <value>org.example.api,org.example.types,blah</value>
                         </property>
                     </instructions>
                 </configuration>
