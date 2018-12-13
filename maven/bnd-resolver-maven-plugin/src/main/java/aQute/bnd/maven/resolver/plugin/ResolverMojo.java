@@ -90,7 +90,7 @@ public class ResolverMojo extends AbstractMojo {
 			beanProperties.put("project", project);
 			beanProperties.put("settings", settings);
 			Properties mavenProperties = new Properties(beanProperties);
-			mavenProperties.putAll(project.getProperties());
+			mavenProperties.putAll(BeanProperties.transformKeys(project.getProperties()));
 			Processor processor = new Processor(mavenProperties, false);
 
 			for (File runFile : bndruns.getFiles(project.getBasedir(), "*.bndrun")) {
