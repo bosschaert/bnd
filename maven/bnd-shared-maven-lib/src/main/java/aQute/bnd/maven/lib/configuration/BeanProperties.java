@@ -5,7 +5,6 @@ import static java.lang.invoke.MethodHandles.publicLookup;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -87,16 +86,5 @@ public class BeanProperties extends Properties {
 			logger.debug("Could not find field {}[{}]", name, index, e);
 		}
 		return value;
-	}
-
-	public static Properties transformKeys(Properties properties) {
-		for (String key : new HashSet<String>(properties.stringPropertyNames())) {
-			if (key.startsWith("_")) {
-				String val = properties.getProperty(key);
-				String newKey = "-" + key.substring(1);
-				properties.put(newKey, val);
-			}
-		}
-		return properties;
 	}
 }

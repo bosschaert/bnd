@@ -550,7 +550,7 @@ public class BndMavenPlugin extends AbstractMojo {
 					UTF8Properties properties = new UTF8Properties();
 					properties.load(bndElement.getValue(), projectFile, builder);
 					// we use setProperties to handle -include
-					builder.setProperties(baseDir, properties.replaceHere(baseDir));
+					builder.setProperties(baseDir, transformKeys(properties.replaceHere(baseDir)));
 				}
 			} else {
 				logger.warn("Pom defines both bndfile and bnd configuration. Ignoring the bnd configuration in pom: {}",
@@ -567,7 +567,7 @@ public class BndMavenPlugin extends AbstractMojo {
 				UTF8Properties properties = new UTF8Properties();
 				// TODO find a way to pass it through the checking mechanism.
 				properties.putAll(instructions);
-				builder.setProperties(baseDir, properties.replaceHere(baseDir));
+				builder.setProperties(baseDir, transformKeys(properties.replaceHere(baseDir)));
 			} else {
 				logger.warn(
 					"Pom defines both a bnd/bndfile and instructions element. Ignoring the instructions element in pom: {}",
@@ -578,6 +578,7 @@ public class BndMavenPlugin extends AbstractMojo {
 		return projectFile;
 	}
 
+	// Checks that two XML sections are equivalent.
 	private boolean fuzzyEquals(Xpp3Dom d1, Xpp3Dom d2, File projectFile, Builder builder)
 		throws IOException {
 		if (d1 == null && d2 == null)
@@ -618,6 +619,18 @@ public class BndMavenPlugin extends AbstractMojo {
 			}
 		}
 		return true;
+	}
+
+	private static Properties transformKeys(Properties properties) {
+		for (String key : new HashSet<String>(properties.stringPropertyNames())) {
+			if (key.startsWith("_")) {
+				String val = properties.getProperty(key);
+				String newKey = "-" + key.substring(1);
+				properties.remove(key);
+				properties.put(newKey, val);
+			}
+		}
+		return properties;
 	}
 
 	private Optional<Xpp3Dom> getConfiguration(List<Plugin> plugins) {

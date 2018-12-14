@@ -45,12 +45,8 @@
                 <configuration>
                      
                     <instructions>
-                        <Here>${.}</Here>
                         <TestKey>testval</TestKey>
-                        <property>
-                            <name>-exportcontents</name>
-                            <value>org.example.api,org.example.types,blah</value>
-                        </property>
+                        <_exportcontents>org.example.api,org.example.types,blah</_exportcontents>
                     </instructions>
                 </configuration>
             </plugin>

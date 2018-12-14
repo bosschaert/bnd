@@ -44,11 +44,6 @@
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
                 <configuration>
-                <!-- 
-                    <instructions>
-                        <Foofoo>barbar</Foofoo>
-                    </instructions>
-                     -->
                     <bnd><![CDATA[Myotherkey: myothervalue]]></bnd>
                 </configuration>
             </plugin>
