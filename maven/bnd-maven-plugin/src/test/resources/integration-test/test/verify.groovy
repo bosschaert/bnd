@@ -106,7 +106,6 @@ assert impl_manifest.getValue('Project-Sourcepath')
 assert !wrapper_manifest.getValue('Project-Sourcepath')
 assert pom_instr_manifest.getValue('Project-Sourcepath')
 assert api_manifest.getValue('Here') == new File(basedir, 'test-api-bundle').absolutePath.replace(File.separatorChar, '/' as char)
-// assert pom_instr_manifest.getValue('Here') == new File(basedir, 'test-pom-instructions').absolutePath.replace(File.separatorChar, '/' as char)
 assert api_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
 assert pom_instr_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
 assert impl_manifest.getValue('Parent-Here') == basedir.absolutePath.replace(File.separatorChar, '/' as char)
@@ -123,7 +122,7 @@ assert pom_instr_jar.getEntry('org/example/api/') != null
 assert pom_instr_jar.getEntry('org/example/api/aresource.txt') != null
 assert pom_instr_jar.getInputStream(api_jar.getEntry('org/example/api/aresource.txt')).text =~ /This is a resource/
 assert pom_instr_jar.getEntry('org/example/types/') != null
-assert pom_instr_jar.getEntry('OSGI-OPT/src/') != null
+assert pom_instr_jar.getEntry('OSGI-OPT/src/') == null
 assert impl_jar.getEntry('OSGI-INF/org.example.impl.ExampleComponent.xml') != null
 assert impl_jar.getEntry('OSGI-INF/metatype/org.example.impl.Config.xml') != null
 assert wrapper_jar.getEntry('org/example/api/') != null
